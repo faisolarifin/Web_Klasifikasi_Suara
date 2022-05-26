@@ -8,12 +8,12 @@ from flask import Flask, render_template, request, redirect, url_for, abort, ses
 from flask import render_template_string, stream_with_context
 import pymysql.cursors
 
-port = 5000
-app = Flask(__name__)
+project_root = os.path.dirname(__file__)
+template_path = os.path.join(project_root, 'templates')
+static_path = os.path.join(project_root, 'static')
 
-app.template_folder = 'templates'
-app.static_folder = 'static' 
-app.secret_key = 'ubah secret key'
+app = Flask(__name__, template_folder=template_path, static_folder=static_path)
+app.secret_key = 'ini kunci rahasia'
 
 ### Database connection configuration
 # cursor=conn=None
@@ -358,4 +358,4 @@ def result():
 
 if __name__ == '__main__':
   # Start the Flask server in a new thread
-  app.run()
+  app.run(host='0.0.0.0', port=80)
