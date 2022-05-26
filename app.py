@@ -16,7 +16,6 @@ app = Flask(__name__, template_folder=template_path, static_folder=static_path)
 app.secret_key = 'ini kunci rahasia'
 
 ### Database connection configuration
-# cursor=conn=None
 # def openDb():
 #   global conn, cursor
 #   conn = pymysql.connect(host="localhost",
@@ -26,6 +25,7 @@ app.secret_key = 'ini kunci rahasia'
 #       autocommit=True)
 #   cursor = conn.cursor()
 
+cursor=conn=None
 def openDb():
   global conn, cursor
   conn = pymysql.connect(host="voice-classif-2.c89o8ilr3iqe.us-east-1.rds.amazonaws.com",
