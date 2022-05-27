@@ -481,7 +481,7 @@ def testing():
     return render_template('404.html')
   
   fileTesting = "temp/test.pkl"
-  if request.method == 'POST' and os.path.exist(fileTesting):
+  if request.method == 'POST' and os.path.exists(fileTesting):
     test = pickle.load(open(fileTesting, "rb"))
     model = load_model('models/audio_model.h5')
     y_pred = model.predict(test["x_test"])
@@ -547,4 +547,4 @@ def result():
 
 if __name__ == '__main__':
   # Start the Flask server in a new thread
-  app.run(host='0.0.0.0',port=80, debug=True)
+  app.run(host='0.0.0.0',port=8000, debug=True)
