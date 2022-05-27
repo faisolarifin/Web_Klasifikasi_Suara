@@ -158,7 +158,7 @@
                                             <th>ID Dataset</th>
                                             <th>Kelas</th>
                                             <th>Nama Voice</th>
-                                            <th>Voice</th>
+                                            <th>Play Voice</th>
                                             <th class="text-center">Aksi</th>
                                         </tr>
                                     </thead>
@@ -168,11 +168,8 @@
                                           <td>{{ row[0] }}</td>
                                           <td>{{ row[1] }}</td>
                                           <td>{{ row[2] }}</td>
-                                          <td>
-                                             <audio controls>
-                                                {% set file = 'voice/' + row[1] + '/' + row[2] %}
-                                                <source src="{{ url_for('static', filename=file) }}" type="audio/wav">
-                                             </audio>
+                                          <td class="text-center">
+                                            <a href="{{url_for('playAudio', table='ds', id=row[0])}}" class="btn btn-success btn-circle" role="button"> <i class="fas fa-play"></i></a>
                                           </td>
                                           <td class="text-center">
                                              <a href="{{url_for('editDs', id=row[0])}}" class="btn btn-warning btn-sm" role="button">Ubah</a>

@@ -1,0 +1,6 @@
+- Login admin;
+- Dibuatkan fitur penambahan, edit, dan delete (CRUD) dataset melalui web dari sisi admin.;
+- Training dataset melalui web (admin);
+- Tambahkan grafik hasil training di halaman admin.;
+- Buat log hasil identifikasi rekaman dan disimpan di database.;
+- percantik web (tampilan web, bootstrap tombol identifikasi dan download);
