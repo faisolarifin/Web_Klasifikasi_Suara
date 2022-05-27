@@ -406,10 +406,9 @@ def stream():
   num_batch_size = row[2]
   closeDb()
 
-  @stream_with_context
   def generate():
     model = my_model()
-    # f = open("temp/log_train.txt", "w")
+    f = open("temp/log_train.txt", "w")
 
     stream = io.StringIO()
     model.summary(print_fn=lambda x:stream.write(x + '<br>'))
@@ -444,9 +443,10 @@ def stream():
 
     yield "<li>Accuracy : {:.2f} Loss : {:.2f} </li>\n".format(acc, loss) 
     f.write('<li>Accuracy : {:.2f} Loss : {:.2f} </li>'.format(acc, loss))
-    yield "<li>[INFO] Training process finish...</li>\n"
+    yield "[INFO] Training process finish... <a href='/training'>back to admin</a> \n"
     f.write('<li>[INFO] Training process finish...</li></ul>')
     f.close()
+  # generate()
 
   return app.response_class(generate())
 
@@ -467,7 +467,8 @@ def training():
       val = (request.form['epoch'], request.form['bs'])
       cursor.execute(sql, val)
       conn.commit()
-      train_model = True
+      train_model = False
+      return redirect(url_for('stream'))
   closeDb()
 
   f = open("temp/log_train.txt", "r")
