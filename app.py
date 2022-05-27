@@ -411,40 +411,40 @@ def stream():
     model = my_model()
     # f = open("temp/log_train.txt", "w")
 
-    # stream = io.StringIO()
-    # model.summary(print_fn=lambda x:stream.write(x + '<br>'))
-    # summary_string = stream.getvalue()
-    # stream.close()
-    # yield summary_string + '\n'
+    stream = io.StringIO()
+    model.summary(print_fn=lambda x:stream.write(x + '<br>'))
+    summary_string = stream.getvalue()
+    stream.close()
+    yield summary_string + '\n'
     # f.write(f'<ul><li>{summary_string}</li>')
 
     yield "[INFO] Preparing... <br>\n"
     # f.write('<li>[INFO] Preparing...</li>')
-    # create_metadata()
-    # x_train, y_train, x_test, y_test = data_train_test()
+    create_metadata()
+    x_train, y_train, x_test, y_test = data_train_test()
 
     yield "[INFO] Training process running... <br>\n"
     # f.write('<li>[INFO] Training process running...</li>')
-    # time.sleep(0.8)
-    # yield f"[INFO] Parameter set with {num_epochs} epoch and {num_batch_size} batch size <br>\n"
+    time.sleep(0.8)
+    yield f"[INFO] Parameter set with {num_epochs} epoch and {num_batch_size} batch size <br>\n"
     # f.write(f'<li>[INFO] Parameter set with {num_epochs} epoch and {num_batch_size} batch size</li>')
-    # time.sleep(0.6)
-    # yield "[INFO] Please wait. don't refresh browser until the finished... <br>\n"
+    time.sleep(0.6)
+    yield "[INFO] Please wait. don't refresh browser until the finished... <br>\n"
     # f.write('<li>[INFO] Please wait. dont refresh browser until the finished...</li>')
 
-    # hist = model.fit(x_train, y_train,
-    #  batch_size=num_batch_size,
-    #   epochs=num_epochs,
-    #    validation_data=(x_test, y_test),
-    #     callbacks=[callbacks],
-    #      verbose=0)
-    # model.save(nama_model)
-    # save_chart_loss_acc(hist)
-    # acc, loss = model.evaluate(x_test,y_test, verbose=0)
+    hist = model.fit(x_train, y_train,
+     batch_size=num_batch_size,
+      epochs=num_epochs,
+       validation_data=(x_test, y_test),
+        callbacks=[callbacks],
+         verbose=0)
+    model.save(nama_model)
+    save_chart_loss_acc(hist)
+    acc, loss = model.evaluate(x_test,y_test, verbose=0)
 
-    # yield "<li>Accuracy : {:.2f} Loss : {:.2f} </li>\n".format(acc, loss) 
+    yield "<li>Accuracy : {:.2f} Loss : {:.2f} </li>\n".format(acc, loss) 
     # f.write('<li>Accuracy : {:.2f} Loss : {:.2f} </li>'.format(acc, loss))
-    # yield "<li>[INFO] Training process finish...</li>\n"
+    yield "<li>[INFO] Training process finish...</li>\n"
     # f.write('<li>[INFO] Training process finish...</li></ul>')
     # f.close()
 
