@@ -253,6 +253,7 @@
             if (xhr.readyState == XMLHttpRequest.DONE) {
                 clearInterval(timer);
                 latest.innerHTML = "Training grafik:<br><img src='static/grafik/train_chart.png' width='800' alt='..'>";
+                window.location.reload(); 
             }
         }, 1000);
         </script>
