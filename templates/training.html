@@ -166,14 +166,9 @@
                         </div>
                         <div class="card-body">
                             <p>This is all the output:</p>
-                            <!-- <ul id="output"></ul>
-                            <p><span id="latest"></span></p> -->
-                            <iframe frameborder="0" 
-                                onresize="noresize"
-                                style='background: transparent; width: 100%; height:100%;' 
-                                src="{{ url_for('stream') }}">
-                            </iframe>
-                                                
+                            <ul id="output"></ul>
+                            <p><span id="latest"></span></p>
+                            
                         </div>
                     </div>
 
@@ -230,7 +225,7 @@
 
     {% if train_model %}
 
-    <!-- <script>
+    <script>
         var latest = document.getElementById('latest');
         var output = document.getElementById('output');
         
@@ -267,7 +262,7 @@
         var latest = document.getElementById('latest');
         output.innerHTML = '{{log | safe}}';
         latest.innerHTML = "Training grafik :<br><img src='static/grafik/train_chart.png' width='800' alt='..'>";
-    </script> -->
+    </script>
     {% endif %}
 
 </body>
