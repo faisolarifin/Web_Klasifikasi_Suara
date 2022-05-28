@@ -209,7 +209,6 @@ def openDb():
      database="voice_classification",
       port=3306,
        autocommit=True,
-        charset='utf8mb4',
          cursorclass=pymysql.cursors.DictCursor)
   cursor = conn.cursor()
 
