@@ -66,11 +66,13 @@ class myCallback(tf.keras.callbacks.Callback):
     training_process = False
     
   def on_epoch_end(self, epochs, logs={}) :
+    global training_process
     global accuracy_threshold
     if((logs.get('accuracy') is not None and logs.get('accuracy') >= accuracy_threshold) 
       and (logs.get('val_accuracy') is not None and logs.get('val_accuracy') >= val_accuracy_threshold)) :
         print('\nSudah mencapai akurasi 100%, maka training dihentikan!')
         self.model.stop_training = True
+        training_process = False
 
       
 callbacks = myCallback()
