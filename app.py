@@ -102,10 +102,10 @@ def create_metadata():
     noc=0
     openDb()
     for i in class_nama:
-      cursor.execute('SELECT * FROM dataset where kelas=%s', (i))
+      cursor.execute('SELECT nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas AND kls.nm_kelas==%s', (i))
       results = cursor.fetchall()
       for row in results:
-        dr=dataset+"/"+row[1]+"/"+row[2]
+        dr=dataset+"/"+row[0]+"/"+row[1]
         data = extract_features(dr)
         features.append([dr,data, noc])
         datacsv=[dr,data, noc]
