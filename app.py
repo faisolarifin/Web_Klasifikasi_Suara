@@ -208,7 +208,9 @@ def openDb():
     password="myawsdb221",
      database="voice_classification",
       port=3306,
-       autocommit=True)
+       autocommit=True,
+        charset='utf8mb4',
+         cursorclass=pymysql.cursors.DictCursor)
   cursor = conn.cursor()
 
 def closeDb():
@@ -412,6 +414,7 @@ def trainmodel():
   row = cursor.fetchone()
   num_epochs = row[1]
   num_batch_size = row[2]
+  closeDb()
 
   if training_process == True:
     return f"[INFO] Please Wait.. <br> [INFO] Training parameter {num_epochs} epoch and {num_batch_size} batch size <br> [INFO] Model Training in Progress..."
@@ -463,7 +466,6 @@ def trainmodel():
     training_process = False
     print("training selesai")
 
-  closeDb()
   return app.response_class(generate())
 
 @app.route('/training', methods=['GET', 'POST'])
