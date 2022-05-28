@@ -208,8 +208,7 @@ def openDb():
     password="myawsdb221",
      database="voice_classification",
       port=3306,
-       autocommit=True,
-         cursorclass=pymysql.cursors.DictCursor)
+       autocommit=True)
   cursor = conn.cursor()
 
 def closeDb():
@@ -446,6 +445,7 @@ def trainmodel():
     time.sleep(0.6)
     yield "[INFO] Please wait. don't refresh browser until the finished... <br>\n"
     f.write('<li>[INFO] Please wait. dont refresh browser until the finished...</li>')
+    yield "[INFO] <a href='/training'>back to training page</a> <br>\n"
     f.write('<li>[INFO] Training process finish...</li></ul>')
     f.close()
 
