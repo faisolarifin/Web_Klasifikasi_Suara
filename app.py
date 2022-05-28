@@ -422,6 +422,7 @@ def trainmodel():
     training_process = True
 
     print("training start")
+    yield "[INFO]<p> <a href='/training'><< back to training page</a> </p><br>\n"
     model = my_model()
     f = open("temp/log_train.txt", "w")
 
@@ -445,7 +446,6 @@ def trainmodel():
     time.sleep(0.6)
     yield "[INFO] Please wait. don't refresh browser until the finished... <br>\n"
     f.write('<li>[INFO] Please wait. dont refresh browser until the finished...</li>')
-    yield "[INFO] <a href='/training'>back to training page</a> <br>\n"
     f.write('<li>[INFO] Training process finish...</li></ul>')
     f.close()
 
