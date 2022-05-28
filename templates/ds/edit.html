@@ -27,81 +27,7 @@
     <!-- Page Wrapper -->
     <div id="wrapper">
 
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
-            <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="index.html">
-                <div class="sidebar-brand-icon rotate-n-15">
-                    <i class="fas fa-question"></i>
-                </div>
-                <div class="sidebar-brand-text mx-2">Voice Admin</div>
-            </a>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider my-0">
-
-            <!-- Nav Item - Dashboard -->
-            <li class="nav-item">
-                <a class="nav-link" href="/dashboard">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
-            </li>
-
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Master Data
-            </div>
-            
-            <!-- Nav Item - Charts -->
-            <li class="nav-item">
-            <a class="nav-link" href="/ds">
-                <i class="fas fa-fw fa-database"></i>
-                <span>Dataset</span></a>
-            </li>
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Model
-            </div>
-            <li class="nav-item">
-            <a class="nav-link" href="/training">
-                <i class="fas fa-fw fa-microchip"></i>
-                <span>Training</span></a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="/testing">
-                    <i class="fas fa-fw fa-chart-area"></i>
-                    <span>Evaluation</span></a>
-            </li>
-            <!-- Divider -->
-            <hr class="sidebar-divider">
-
-            <!-- Heading -->
-            <div class="sidebar-heading">
-                Log
-            </div>
-            <li class="nav-item">
-            <a class="nav-link" href="/log">
-                <i class="fas fa-fw fa-microphone"></i>
-                <span>Log Identifikasi</span></a>
-            </li>
-            <hr class="sidebar-divider d-none d-md-block">
-
-            <!-- Divider -->
-
-            <!-- Sidebar Toggler (Sidebar) -->
-            <div class="text-center d-none d-md-inline">
-                <button class="rounded-circle border-0" id="sidebarToggle"></button>
-            </div>
-
-        </ul>
-        <!-- End of Sidebar -->
+        {% include 'menu.html' %}
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
@@ -144,7 +70,7 @@
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
                         <div class="card-header py-3">
-                           <h5 class="m-0 mt-1 font-weight-bold text-primary d-inline-block">Dataset</h5>
+                           <h5 class="m-0 mt-1 font-weight-bold text-primary d-inline-block">Edit Dataset</h5>
                         </div>
                         <div class="card-body">
                            <form action="url_for('editDs', id_ds={{data[0]}})" method="post" enctype="multipart/form-data">
@@ -153,12 +79,17 @@
                               </div>
                               <div class="form-group">
                                  <label>Kelas:</label>
-                                 <input type="hidden" name="old_kelas"  value="{{data[1]}}"/>
-                                 <input type="text" name="kelas" class="form-control" value="{{data[1]}}" placeholder="Masukan kelas dataset" required />
+                                 <input type="hidden" name="old_kelas"  value="{{data[2]}}"/>
+                                 <select class="custom-select" name="kelas" required>
+                                {% for row in rowKelas %}
+                                    {% set selected  = 'selected' if (row[0]|int)==(data[1]|int) else ''  %}
+                                    <option value="{{row[0]}}::{{row[1]}}" {{selected}}>{{row[1]}}</option>
+                                {% endfor %}
+                                </select>
                               </div>
                               <div class="form-group">
                                  <label>Voice:</label>
-                                 <input type="hidden" name="old_voice"  value="{{data[2]}}"/>
+                                 <input type="hidden" name="old_voice"  value="{{data[3]}}"/>
                                  <input class="form-control" type="file" name="voice" accept="audio/wav">
                               </div>
                               <button type="submit" id="Submit" name="submit" class="btn btn-primary">Edit</button>

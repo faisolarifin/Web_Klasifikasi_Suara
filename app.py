@@ -1,6 +1,7 @@
 #library for flask web
 import io, os
 import time
+import shutil
 from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, abort, session
 from flask import render_template_string, stream_with_context
@@ -201,6 +202,16 @@ app.secret_key = 'ini kunci rahasia'
 ###=>>END FLASK ROOT SETTING
 
 ###=>>KONEKSI DATABASE
+# cursor=conn=None
+# def openDb():
+#   global conn, cursor
+#   conn = pymysql.connect(host="localhost",
+#    user="root",
+#     password="",
+#      database="voice_classif",
+#       port=3306,
+#        autocommit=True)
+#   cursor = conn.cursor()
 cursor=conn=None
 def openDb():
   global conn, cursor
@@ -290,6 +301,106 @@ def log():
   closeDb()
   return render_template('log/index.html', rowData=rowData)
 
+#####################
+# KELAS             #
+#####################
+
+#fungsi view index() untuk menampilkan kelas
+@app.route('/kelas')
+def indexKelas():
+  #jika admin belum login munculkan 404
+  if 'loggedin' not in session:
+    return render_template('404.html')
+
+  openDb()
+  rowData = []
+  sql = "SELECT * FROM kelas"
+  cursor.execute(sql)
+  results = cursor.fetchall()
+  for data in results:
+    rowData.append(data)
+  closeDb()
+  return render_template('kelas/index.html', rowData=rowData)
+
+#fungsi untuk menghapus data
+@app.route('/kelas/hapus/<id>', methods=['GET','POST'])
+def hapusKelas(id):
+  #jika admin belum login munculkan 404
+  if 'loggedin' not in session:
+    return render_template('404.html')
+
+  openDb()
+  cursor.execute('SELECT * FROM kelas WHERE id=%s', (id,))
+  row = cursor.fetchone()
+  #remove folder kelas
+  shutil.rmtree(f"static/voice/{row[1]}")   
+  cursor.execute('DELETE FROM kelas WHERE id=%s', (id,))
+  conn.commit()
+  closeDb()
+  return redirect(url_for('indexKelas'))
+
+#fungsi view edit() untuk form edit
+@app.route('/kelas/edit/<id>', methods=['GET','POST'])
+def editKelas(id):
+  #jika admin belum login munculkan 404
+  if 'loggedin' not in session:
+    return render_template('404.html')
+
+  openDb()
+  cursor.execute('SELECT * FROM kelas WHERE id=%s', (id))
+  data = cursor.fetchone()
+  if request.method == 'POST':
+    old_id = request.form['id']
+    old_kelas = request.form['old_kelas']
+
+    kelas = request.form['kelas'].capitalize()
+    cursor.execute('SELECT * FROM kelas WHERE nm_kelas=%s', (kelas))
+
+    if cursor.fetchone() != None:
+      return render_template('kelas/edit.html', msg='Nama Kelas Sudah Ada!', data=data)
+    else:
+      sql = "UPDATE kelas SET nm_kelas=%s WHERE id=%s"
+      val = (kelas, old_id)
+      cursor.execute(sql, val)
+      conn.commit()
+      os.rename(f"static/voice/{old_kelas}", f"static/voice/{kelas}")
+    closeDb()
+
+    return redirect(url_for('indexKelas'))
+  else:
+    return render_template('kelas/edit.html', data=data, msg='')
+
+#fungsi view tambah() untuk membuat form tambah
+@app.route('/kelas/tambah', methods=['GET','POST'])
+def tambahKelas():
+  #jika admin belum login munculkan 404
+  if 'loggedin' not in session:
+    return render_template('404.html')
+
+  if request.method == 'POST':
+    kelas = request.form['kelas'].capitalize()
+    openDb()
+    cursor.execute('SELECT * FROM kelas WHERE nm_kelas=%s', (kelas))
+
+    if cursor.fetchone() != None:
+      return render_template('kelas/tambah.html', msg='Nama Kelas Sudah Ada!')
+    else :
+      sql = "INSERT INTO kelas (nm_kelas) VALUES (%s)"
+      val = (kelas)
+      cursor.execute(sql, val)
+      conn.commit()
+      if not os.path.exists(f"static/voice/{kelas}"):
+        os.mkdir(f"static/voice/{kelas}")
+    closeDb()
+
+    return redirect(url_for('indexKelas'))
+  else:
+    return render_template('kelas/tambah.html', msg='')
+
+####################
+#END KELAS         #
+####################
+
 #fungsi view index() untuk menampilkan data dari database
 @app.route('/ds')
 def indexDs():
@@ -299,13 +410,23 @@ def indexDs():
 
   openDb()
   rowData = []
-  sql = "SELECT * FROM dataset"
+  sql = "SELECT ds.id, nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas"
   cursor.execute(sql)
   results = cursor.fetchall()
   for data in results:
     rowData.append(data)
   closeDb()
   return render_template('ds/index.html', rowData=rowData)
+###get semua record kelas dataset
+def getKelas():
+  openDb()
+  rowKelas = []
+  cursor.execute("select * from kelas")
+  results = cursor.fetchall()
+  for row in results:
+    rowKelas.append(row)
+  closeDb()
+  return rowKelas
 
 #fungsi view tambah() untuk membuat form tambah
 @app.route('/ds/tambah', methods=['GET','POST'])
@@ -313,27 +434,26 @@ def tambahDs():
   #jika admin belum login munculkan 404
   if 'loggedin' not in session:
     return render_template('404.html')
-
+  
   if request.method == 'POST':
-    kelas = request.form['kelas']
+    kelas = request.form['kelas'].split('::')
     voice = request.files['voice']
     nm_voice = voice.filename
 
     openDb()
     sql = "INSERT INTO dataset (kelas, voice_name) VALUES (%s, %s)"
-    val = (kelas, nm_voice)
+    val = (kelas[0], nm_voice)
     cursor.execute(sql, val)
     conn.commit()
     closeDb()
 
     if voice.filename != '':
-      os.makedirs(os.path.dirname('static/voice/%s' % (kelas)), exist_ok=True) 
-      path = 'static/voice/%s/%s' % (kelas, nm_voice)  
-      voice.save(path)
-
+      if os.path.isdir(f'static/voice/{kelas[1]}'):
+        path = 'static/voice/%s/%s' % (kelas[1], nm_voice)
+        voice.save(path)
     return redirect(url_for('indexDs'))
   else:
-    return render_template('ds/tambah.html')
+    return render_template('ds/tambah.html', rowKelas=getKelas())
 
 #fungsi view edit() untuk form edit
 @app.route('/ds/edit/<id>', methods=['GET','POST'])
@@ -343,31 +463,34 @@ def editDs(id):
     return render_template('404.html')
 
   openDb()
-  cursor.execute('SELECT * FROM dataset WHERE id=%s', (id))
+  cursor.execute('SELECT ds.id, kls.id, nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas AND ds.id=%s', (id))
   data = cursor.fetchone()
   if request.method == 'POST':
     old_id = request.form['id']
     old_kelas = request.form['old_kelas']
     old_voice = request.form['old_voice']
 
-    kelas = request.form['kelas']
+    kelas = request.form['kelas'].split('::')
     voice = request.files['voice']
     nm_voice = voice.filename or request.form['old_voice']
     sql = "UPDATE dataset SET kelas=%s, voice_name=%s WHERE id=%s"
-    val = (kelas, nm_voice, old_id)
+    val = (kelas[0], nm_voice, old_id)
     cursor.execute(sql, val)
     conn.commit()
     closeDb()
-
-    if voice.filename != '':
+    
+    if voice.filename == '' and old_kelas != kelas[1]:
+      shutil.move(f"static/voice/{old_kelas}/{old_voice}", f"static/voice/{kelas[1]}/{old_voice}")
+  
+    elif voice.filename != '':
       path = 'static/voice/%s/%s' % (old_kelas, old_voice)
       if os.path.exists(path):
         os.remove(path)
-      voice.save('static/voice/%s/%s' % (kelas, nm_voice))
+      voice.save('static/voice/%s/%s' % (kelas[1], nm_voice))
 
     return redirect(url_for('indexDs'))
   else:
-    return render_template('ds/edit.html', data=data)
+    return render_template('ds/edit.html', data=data, rowKelas=getKelas())
 
 #fungsi untuk menghapus data
 @app.route('/ds/hapus/<id>', methods=['GET','POST'])
@@ -377,12 +500,13 @@ def hapusDs(id):
     return render_template('404.html')
 
   openDb()
-  cursor.execute('SELECT * FROM dataset WHERE id=%s', (id,))
+  cursor.execute('SELECT nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas AND ds.id=%s', (id,))
   row = cursor.fetchone()
-  os.remove('static/voice/%s/%s' % (row[1], row[2])  )
+  os.remove(f"static/voice/{row[0]}/{row[1]}")
   cursor.execute('DELETE FROM dataset WHERE id=%s', (id,))
   conn.commit()
   closeDb()
+
   return redirect(url_for('indexDs'))
 
 ###>>PAGE PLAYING AUDIO 
@@ -390,9 +514,9 @@ def hapusDs(id):
 def playAudio(table, id):
   openDb()
   if table == 'ds':
-    cursor.execute('SELECT * FROM dataset WHERE id=%s', (id,))
+    cursor.execute('SELECT ds.id, nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas AND ds.id=%s', (id,))
     row = cursor.fetchone()
-    kelas = 'Abyan'
+    kelas = row[1]
     audioName = row[2]
     fileAudio = 'voice/%s/%s' % (row[1], row[2])
   elif table == 'li':

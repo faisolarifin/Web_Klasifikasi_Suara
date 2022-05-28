@@ -4,3 +4,5 @@
 - Tambahkan grafik hasil training di halaman admin.;
 - Buat log hasil identifikasi rekaman dan disimpan di database.;
 - percantik web (tampilan web, bootstrap tombol identifikasi dan download);
+
+SELECT ds.id, nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas; 
