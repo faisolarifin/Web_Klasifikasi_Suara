@@ -57,9 +57,14 @@ num_labels=len(class_nama)
 #predict_threshold=0.75
 accuracy_threshold = 1.0000
 val_accuracy_threshold = 1.0000
+training_process = False
 
 ### Model Fitting Callback
 class myCallback(tf.keras.callbacks.Callback):
+  def on_train_end(self, logs=None):
+    global training_process
+    training_process = False
+    
   def on_epoch_end(self, epochs, logs={}) :
     global accuracy_threshold
     if((logs.get('accuracy') is not None and logs.get('accuracy') >= accuracy_threshold) 
@@ -67,6 +72,7 @@ class myCallback(tf.keras.callbacks.Callback):
         print('\nSudah mencapai akurasi 100%, maka training dihentikan!')
         self.model.stop_training = True
 
+      
 callbacks = myCallback()
 
 # function to extract feature from audio
@@ -87,6 +93,7 @@ def extract_features(file_name):
 ## function to extract all audio
 def create_metadata():
   global features
+  features = []
   with open("metadata.csv", 'w', encoding='UTF8') as f:
     writer = csv.writer(f)
     writer.writerow(header)
@@ -397,7 +404,6 @@ def playAudio(table, id):
   data = [kelas, audioName, fileAudio]
   return render_template('playaudio.html', data=data)
 
-training_process = False
 @app.route("/trainmodel")
 def trainmodel():
   global training_process
@@ -438,6 +444,8 @@ def trainmodel():
     time.sleep(0.6)
     yield "[INFO] Please wait. don't refresh browser until the finished... <br>\n"
     f.write('<li>[INFO] Please wait. dont refresh browser until the finished...</li>')
+    f.write('<li>[INFO] Training process finish...</li></ul>')
+    f.close()
 
     hist = model.fit(x_train, y_train,
      batch_size=num_batch_size,
@@ -450,10 +458,8 @@ def trainmodel():
     acc, loss = model.evaluate(x_test,y_test, verbose=0)
 
     yield "<li>Accuracy : {:.2f} Loss : {:.2f} </li>\n".format(acc, loss) 
-    f.write('<li>Accuracy : {:.2f} Loss : {:.2f} </li>'.format(acc, loss))
+    # f.write('<li>Accuracy : {:.2f} Loss : {:.2f} </li>'.format(acc, loss))
     yield "[INFO] Training process finish... <a href='/training'>back to admin</a> \n"
-    f.write('<li>[INFO] Training process finish...</li></ul>')
-    f.close()
     training_process = False
     print("training selesai")
 
