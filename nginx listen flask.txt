@@ -1,0 +1,14 @@
+ GNU nano 6.2                                                               /etc/nginx/sites-available/brightevents.com
+server {
+        listen 443 ssl;
+        server_name 3.87.192.191;
+        include snippets/self-signed.conf;
+        location / {proxy_pass http://127.0.0.1:8000/;
+        }
+}
+
+server {
+ listen 80;
+ server_name 3.87.192.191;
+ return 301 https://$host$request_uri;
+}

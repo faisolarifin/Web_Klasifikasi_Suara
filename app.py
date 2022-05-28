@@ -5,7 +5,7 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, abort, session
 from flask import render_template_string, stream_with_context
 import pymysql.cursors
-
+from threading import Thread
 
 ###****************************###
 #  DEEP CNN LEARNING UTILITIES   #
@@ -397,16 +397,24 @@ def playAudio(table, id):
   data = [kelas, audioName, fileAudio]
   return render_template('playaudio.html', data=data)
 
-@app.route("/stream")
-def stream():
+training_process = False
+@app.route("/trainmodel")
+def trainmodel():
+  global training_process
   openDb()
   cursor.execute('SELECT * FROM hyperparam where id=1')
   row = cursor.fetchone()
   num_epochs = row[1]
   num_batch_size = row[2]
-  closeDb()
+
+  if training_process == True:
+    return f"[INFO] Please Wait.. <br> [INFO] Training parameter {num_epochs} epoch and {num_batch_size} batch size <br> [INFO] Model Training in Progress..."
 
   def generate():
+    global training_process
+    training_process = True
+
+    print("training start")
     model = my_model()
     f = open("temp/log_train.txt", "w")
 
@@ -436,7 +444,7 @@ def stream():
       epochs=num_epochs,
        validation_data=(x_test, y_test),
         callbacks=[callbacks],
-         verbose=0)
+         verbose=1)
     model.save(nama_model)
     save_chart_loss_acc(hist)
     acc, loss = model.evaluate(x_test,y_test, verbose=0)
@@ -446,8 +454,10 @@ def stream():
     yield "[INFO] Training process finish... <a href='/training'>back to admin</a> \n"
     f.write('<li>[INFO] Training process finish...</li></ul>')
     f.close()
-  # generate()
+    training_process = False
+    print("training selesai")
 
+  closeDb()
   return app.response_class(generate())
 
 @app.route('/training', methods=['GET', 'POST'])
@@ -468,11 +478,11 @@ def training():
       cursor.execute(sql, val)
       conn.commit()
       train_model = False
-      return redirect(url_for('stream'))
+      return redirect(url_for('trainmodel'))
   closeDb()
 
   f = open("temp/log_train.txt", "r")
-  return render_template('training.html', train_model=train_model, row=rowData, log=f.read())
+  return render_template('training.html', train_model=train_model, training_process=training_process, row=rowData, log=f.read())
 
 
 @app.route('/testing', methods=['GET', 'POST'])
