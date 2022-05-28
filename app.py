@@ -5,7 +5,6 @@ from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, abort, session
 from flask import render_template_string, stream_with_context
 import pymysql.cursors
-from threading import Thread
 
 ###****************************###
 #  DEEP CNN LEARNING UTILITIES   #
