@@ -422,7 +422,7 @@ def trainmodel():
     training_process = True
 
     print("training start")
-    yield "[INFO]<p> <a href='/training'><< back to training page</a> </p><br>\n"
+    yield "<p> <a href='/training'><< back to training page</a> </p>\n"
     model = my_model()
     f = open("temp/log_train.txt", "w")
 
