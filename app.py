@@ -439,20 +439,23 @@ def tambahDs():
   
   if request.method == 'POST':
     kelas = request.form['kelas'].split('::')
-    voice = request.files['voice']
-    nm_voice = voice.filename
+    voices = request.files.getlist("voice[]")
 
     openDb()
-    sql = "INSERT INTO dataset (kelas, voice_name) VALUES (%s, %s)"
-    val = (kelas[0], nm_voice)
-    cursor.execute(sql, val)
-    conn.commit()
-    closeDb()
+    for voice in voices:
+      nm_voice = voice.filename
+      
+      sql = "INSERT INTO dataset (kelas, voice_name) VALUES (%s, %s)"
+      val = (kelas[0], nm_voice)
+      cursor.execute(sql, val)
+      conn.commit()
 
-    if voice.filename != '':
-      if os.path.isdir(f'static/voice/{kelas[1]}'):
-        path = 'static/voice/%s/%s' % (kelas[1], nm_voice)
-        voice.save(path)
+      if voice.filename != '':
+        if os.path.isdir(f'static/voice/{kelas[1]}'):
+          path = 'static/voice/%s/%s' % (kelas[1], nm_voice)
+          voice.save(path)
+
+    closeDb()
     return redirect(url_for('indexDs'))
   else:
     return render_template('ds/tambah.html', rowKelas=getKelas())
