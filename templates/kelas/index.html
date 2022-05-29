@@ -89,7 +89,7 @@
                                     <tbody>
                                        {% for row in rowData %}
                                        <tr>
-                                          <td>{{ row[0] }}</td>
+                                          <td>{{ loop.index }}</td>
                                           <td>{{ row[1] }}</td>
                                           <td class="text-center">
                                              <a href="{{url_for('editKelas', id=row[0])}}" class="btn btn-warning btn-sm" role="button">Ubah</a>

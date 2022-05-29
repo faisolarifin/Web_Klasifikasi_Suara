@@ -18,7 +18,7 @@ const canvas = document.querySelector('.visualizer');
 recordButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", stopRecording);
 //pauseButton.addEventListener("click", pauseRecording);
-stopButton.style.visibility = "hidden";
+stopButton.style.display = "none";
 //////
 let audioCtx;
 const canvasCtx = canvas.getContext("2d");
@@ -36,8 +36,8 @@ function startRecording() {
  	/*
     	Disable the record button until we get a success or fail from getUserMedia() 
 	*/
-    recordButton.style.visibility = "hidden";
-	stopButton.style.visibility = "visible";
+    recordButton.style.display = "none";
+	stopButton.style.display = "block";
 	
 	recordButton.disabled = true;
 	stopButton.disabled = false;
@@ -107,8 +107,8 @@ function stopRecording() {
 	console.log("stopButton clicked");
 
 	//disable the stop button, enable the record too allow for new recordings
-	recordButton.style.visibility = "visible";
-	stopButton.style.visibility = "hidden";
+	recordButton.style.display = "block";
+	stopButton.style.display = "none";
 	stopButton.disabled = true;
 	recordButton.disabled = false;
 	//pauseButton.disabled = true;

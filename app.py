@@ -102,7 +102,7 @@ def create_metadata():
     noc=0
     openDb()
     for i in class_nama:
-      cursor.execute('SELECT nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas AND kls.nm_kelas==%s', (i))
+      cursor.execute('SELECT nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas AND kls.nm_kelas=%s', (i))
       results = cursor.fetchall()
       for row in results:
         dr=dataset+"/"+row[0]+"/"+row[1]
@@ -334,6 +334,8 @@ def hapusKelas(id):
   row = cursor.fetchone()
   #remove folder kelas
   shutil.rmtree(f"static/voice/{row[1]}")   
+  cursor.execute('DELETE FROM dataset WHERE kelas=%s', (row[0],))
+  conn.commit()
   cursor.execute('DELETE FROM kelas WHERE id=%s', (id,))
   conn.commit()
   closeDb()

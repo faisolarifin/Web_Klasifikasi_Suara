@@ -81,7 +81,7 @@
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
-                                            <th>ID Dataset</th>
+                                            <th>Nomer Urut</th>
                                             <th>Kelas</th>
                                             <th>Nama Voice</th>
                                             <th>Play Voice</th>
@@ -91,7 +91,7 @@
                                     <tbody>
                                        {% for row in rowData %}
                                        <tr>
-                                          <td>{{ row[0] }}</td>
+                                          <td>{{ loop.index }}</td>
                                           <td>{{ row[1] }}</td>
                                           <td>{{ row[2] }}</td>
                                           <td class="text-center">
