@@ -100,7 +100,6 @@ def create_metadata():
     writer = csv.writer(f)
     writer.writerow(header)
     noc=0
-    openDb()
     for i in class_nama:
       cursor.execute('SELECT nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas AND kls.nm_kelas=%s', (i))
       results = cursor.fetchall()
@@ -111,7 +110,6 @@ def create_metadata():
         datacsv=[dr,data, noc]
         writer.writerow(datacsv)
       noc+=1
-    closeDb()
 
 def data_train_test():
   global features
@@ -170,6 +168,7 @@ def my_model():
   return model
 
 def save_chart_loss_acc(history):
+  training_process=False
   plt.figure(figsize=(10, 4))
   plt.subplot(1, 2, 1)
   plt.title('model accuracy')
@@ -244,7 +243,6 @@ def page_not_found(e):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-  openDb()
   # Output message if something goes wrong...
   msg = ''
   # Check if "username" and "password" POST requests exist (user submitted form)
@@ -267,7 +265,6 @@ def login():
     else:
       # Account doesnt exist or username/password incorrect
       msg = 'Username atau password salah!'
-  closeDb()
   # Show the login form with message (if any)
   return render_template('login.html', msg=msg)
 
@@ -291,14 +288,12 @@ def log():
   if 'loggedin' not in session:
     return render_template('404.html')
 
-  openDb()
   rowData = []
   sql = "SELECT * FROM log_identifikasi"
   cursor.execute(sql)
   results = cursor.fetchall()
   for data in results:
     rowData.append(data)
-  closeDb()
   return render_template('log/index.html', rowData=rowData)
 
 #####################
@@ -312,14 +307,12 @@ def indexKelas():
   if 'loggedin' not in session:
     return render_template('404.html')
 
-  openDb()
   rowData = []
   sql = "SELECT * FROM kelas"
   cursor.execute(sql)
   results = cursor.fetchall()
   for data in results:
     rowData.append(data)
-  closeDb()
   return render_template('kelas/index.html', rowData=rowData)
 
 #fungsi untuk menghapus data
@@ -329,7 +322,6 @@ def hapusKelas(id):
   if 'loggedin' not in session:
     return render_template('404.html')
 
-  openDb()
   cursor.execute('SELECT * FROM kelas WHERE id=%s', (id,))
   row = cursor.fetchone()
   #remove folder kelas
@@ -338,7 +330,6 @@ def hapusKelas(id):
   conn.commit()
   cursor.execute('DELETE FROM kelas WHERE id=%s', (id,))
   conn.commit()
-  closeDb()
   return redirect(url_for('indexKelas'))
 
 #fungsi view edit() untuk form edit
@@ -348,7 +339,6 @@ def editKelas(id):
   if 'loggedin' not in session:
     return render_template('404.html')
 
-  openDb()
   cursor.execute('SELECT * FROM kelas WHERE id=%s', (id))
   data = cursor.fetchone()
   if request.method == 'POST':
@@ -366,7 +356,6 @@ def editKelas(id):
       cursor.execute(sql, val)
       conn.commit()
       os.rename(f"static/voice/{old_kelas}", f"static/voice/{kelas}")
-    closeDb()
 
     return redirect(url_for('indexKelas'))
   else:
@@ -381,7 +370,6 @@ def tambahKelas():
 
   if request.method == 'POST':
     kelas = request.form['kelas'].capitalize()
-    openDb()
     cursor.execute('SELECT * FROM kelas WHERE nm_kelas=%s', (kelas))
 
     if cursor.fetchone() != None:
@@ -393,7 +381,6 @@ def tambahKelas():
       conn.commit()
       if not os.path.exists(f"static/voice/{kelas}"):
         os.mkdir(f"static/voice/{kelas}")
-    closeDb()
 
     return redirect(url_for('indexKelas'))
   else:
@@ -410,24 +397,22 @@ def indexDs():
   if 'loggedin' not in session:
     return render_template('404.html')
 
-  openDb()
   rowData = []
   sql = "SELECT ds.id, nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas"
   cursor.execute(sql)
   results = cursor.fetchall()
   for data in results:
     rowData.append(data)
-  closeDb()
+
   return render_template('ds/index.html', rowData=rowData)
+
 ###get semua record kelas dataset
 def getKelas():
-  openDb()
   rowKelas = []
   cursor.execute("select * from kelas")
   results = cursor.fetchall()
   for row in results:
     rowKelas.append(row)
-  closeDb()
   return rowKelas
 
 #fungsi view tambah() untuk membuat form tambah
@@ -441,7 +426,6 @@ def tambahDs():
     kelas = request.form['kelas'].split('::')
     voices = request.files.getlist("voice[]")
 
-    openDb()
     for voice in voices:
       nm_voice = voice.filename
       
@@ -455,7 +439,6 @@ def tambahDs():
           path = 'static/voice/%s/%s' % (kelas[1], nm_voice)
           voice.save(path)
 
-    closeDb()
     return redirect(url_for('indexDs'))
   else:
     return render_template('ds/tambah.html', rowKelas=getKelas())
@@ -467,7 +450,6 @@ def editDs(id):
   if 'loggedin' not in session:
     return render_template('404.html')
 
-  openDb()
   cursor.execute('SELECT ds.id, kls.id, nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas AND ds.id=%s', (id))
   data = cursor.fetchone()
   if request.method == 'POST':
@@ -482,7 +464,6 @@ def editDs(id):
     val = (kelas[0], nm_voice, old_id)
     cursor.execute(sql, val)
     conn.commit()
-    closeDb()
     
     if voice.filename == '' and old_kelas != kelas[1]:
       shutil.move(f"static/voice/{old_kelas}/{old_voice}", f"static/voice/{kelas[1]}/{old_voice}")
@@ -504,20 +485,17 @@ def hapusDs(id):
   if 'loggedin' not in session:
     return render_template('404.html')
 
-  openDb()
   cursor.execute('SELECT nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas AND ds.id=%s', (id,))
   row = cursor.fetchone()
   os.remove(f"static/voice/{row[0]}/{row[1]}")
   cursor.execute('DELETE FROM dataset WHERE id=%s', (id,))
   conn.commit()
-  closeDb()
 
   return redirect(url_for('indexDs'))
 
 ###>>PAGE PLAYING AUDIO 
 @app.route('/play/<table>/<id>', methods=['GET','POST'])
 def playAudio(table, id):
-  openDb()
   if table == 'ds':
     cursor.execute('SELECT ds.id, nm_kelas, voice_name from kelas kls, dataset ds WHERE kls.id=ds.kelas AND ds.id=%s', (id,))
     row = cursor.fetchone()
@@ -530,19 +508,16 @@ def playAudio(table, id):
     kelas = 'Guest'
     audioName = row[1]
     fileAudio = 'voice_upload/%s' % (row[1])
-  closeDb()
   data = [kelas, audioName, fileAudio]
   return render_template('playaudio.html', data=data)
 
 @app.route("/trainmodel")
 def trainmodel():
   global training_process
-  openDb()
   cursor.execute('SELECT * FROM hyperparam where id=1')
   row = cursor.fetchone()
   num_epochs = row[1]
   num_batch_size = row[2]
-  closeDb()
 
   if training_process == True:
     return f"[INFO] Please Wait.. <br> [INFO] Training parameter {num_epochs} epoch and {num_batch_size} batch size <br> [INFO] Model Training in Progress..."
@@ -604,7 +579,6 @@ def training():
     return render_template('404.html')
 
   train_model = False
-  openDb()
   cursor.execute('SELECT * FROM hyperparam where id=1')
   rowData = cursor.fetchone()
 
@@ -616,11 +590,15 @@ def training():
       conn.commit()
       train_model = False
       return redirect(url_for('trainmodel'))
-  closeDb()
 
   f = open("temp/log_train.txt", "r")
   return render_template('training.html', train_model=train_model, training_process=training_process, row=rowData, log=f.read())
 
+@app.route("/stoptrain")
+def stoptrain():
+  global training_process
+  training_process=False
+  return redirect(url_for('training'))
 
 @app.route('/testing', methods=['GET', 'POST'])
 def testing():
@@ -675,12 +653,10 @@ def upload_file():
   f.save(f'static/voice_upload/{temp_file}')
   OUTPUT=prediksi(f'static/voice_upload/{temp_file}')
   if OUTPUT != 'Not Recognized':    
-    openDb()
     sql = "INSERT INTO log_identifikasi (voice_name, result, tgl) VALUES (%s, %s, %s)"
     val = (temp_file, OUTPUT, datetime.now())
     cursor.execute(sql, val)
     conn.commit()
-    closeDb()
   return 0
 
 OUTPUT = 'Not Recognized'
@@ -695,4 +671,5 @@ def result():
 
 if __name__ == '__main__':
   # Start the Flask server in a new thread
+  openDb()
   app.run(host='0.0.0.0',port=8000, debug=True)

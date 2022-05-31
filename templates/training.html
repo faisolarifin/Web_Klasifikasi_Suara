@@ -69,8 +69,8 @@
   
                     <!-- DataTales Example -->
                     <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <form action="/training" method="post">
+                        <div class="card-header pt-3 pb-1">
+                            <form action="{{url_for('training')}}" method="post">
                                 <div class="col-sm-4">
                                     <div class="row">
                                         <div class="col-sm-6 pl-0">
@@ -89,6 +89,7 @@
                                     </div>
                                 </div>
                             </form>
+                            <p class="font-italic mt-2">[*] jangan menghentikan proses loading browser pada setelah menekan tombol Train model, hingga pindah ke halaman log training</p>
                         </div>
                         <div class="card-body">
                             <p>This is all the output:</p>
