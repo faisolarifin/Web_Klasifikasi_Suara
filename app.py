@@ -1,5 +1,6 @@
 #library for flask web
 import io, os
+import logging
 import time
 import shutil
 from datetime import datetime
@@ -404,7 +405,7 @@ def indexDs():
   for data in results:
     rowData.append(data)
 
-  return render_template('ds/index.html', rowData=rowData)
+  return render_template('ds/index.html', rowData=rowData)    
 
 ###get semua record kelas dataset
 def getKelas():
@@ -514,61 +515,65 @@ def playAudio(table, id):
 @app.route("/trainmodel")
 def trainmodel():
   global training_process
-  cursor.execute('SELECT * FROM hyperparam where id=1')
-  row = cursor.fetchone()
-  num_epochs = row[1]
-  num_batch_size = row[2]
+  try:
+    cursor.execute('SELECT * FROM hyperparam where id=1')
+    row = cursor.fetchone()
+    num_epochs = row[1]
+    num_batch_size = row[2]
 
-  if training_process == True:
-    return f"[INFO] Please Wait.. <br> [INFO] Training parameter {num_epochs} epoch and {num_batch_size} batch size <br> [INFO] Model Training in Progress..."
+    if training_process == True:
+      return f"[INFO] Please Wait.. <br> [INFO] Training parameter {num_epochs} epoch and {num_batch_size} batch size <br> [INFO] Model Training in Progress..."
 
-  def generate():
-    global training_process
-    training_process = True
+    def generate():
+      global training_process
+      training_process = True
 
-    print("training start")
-    yield "<p> <a href='/training'><< back to training page</a> </p>\n"
-    model = my_model()
-    f = open("temp/log_train.txt", "w")
+      print("training start")
+      yield "<p> <a href='/training'><< back to training page</a> </p>\n"
+      model = my_model()
+      f = open("temp/log_train.txt", "w")
 
-    stream = io.StringIO()
-    model.summary(print_fn=lambda x:stream.write(x + '<br>'))
-    summary_string = stream.getvalue()
-    stream.close()
-    yield summary_string + '\n'
-    f.write(f'<ul><li>{summary_string}</li>')
+      stream = io.StringIO()
+      model.summary(print_fn=lambda x:stream.write(x + '<br>'))
+      summary_string = stream.getvalue()
+      stream.close()
+      yield summary_string + '\n'
+      f.write(f'<ul><li>{summary_string}</li>')
 
-    yield "[INFO] Preparing... <br>\n"
-    f.write('<li>[INFO] Preparing...</li>')
-    create_metadata()
-    x_train, y_train, x_test, y_test = data_train_test()
+      yield "[INFO] Preparing... <br>\n"
+      f.write('<li>[INFO] Preparing...</li>')
+      create_metadata()
+      x_train, y_train, x_test, y_test = data_train_test()
 
-    yield "[INFO] Training process running... <br>\n"
-    f.write('<li>[INFO] Training process running...</li>')
-    time.sleep(0.8)
-    yield f"[INFO] Parameter set with {num_epochs} epoch and {num_batch_size} batch size <br>\n"
-    f.write(f'<li>[INFO] Parameter set with {num_epochs} epoch and {num_batch_size} batch size</li>')
-    time.sleep(0.6)
-    yield "[INFO] Please wait. don't refresh browser until the finished... <br>\n"
-    f.write('<li>[INFO] Please wait. dont refresh browser until the finished...</li>')
-    f.write('<li>[INFO] Training process finish...</li></ul>')
-    f.close()
+      yield "[INFO] Training process running... <br>\n"
+      f.write('<li>[INFO] Training process running...</li>')
+      time.sleep(0.8)
+      yield f"[INFO] Parameter set with {num_epochs} epoch and {num_batch_size} batch size <br>\n"
+      f.write(f'<li>[INFO] Parameter set with {num_epochs} epoch and {num_batch_size} batch size</li>')
+      time.sleep(0.6)
+      yield "[INFO] Please wait. don't refresh browser until the finished... <br>\n"
+      f.write('<li>[INFO] Please wait. dont refresh browser until the finished...</li>')
+      f.write('<li>[INFO] Training process finish...</li></ul>')
+      f.close()
 
-    hist = model.fit(x_train, y_train,
-     batch_size=num_batch_size,
-      epochs=num_epochs,
-       validation_data=(x_test, y_test),
-        callbacks=[callbacks],
-         verbose=1)
-    model.save(nama_model)
-    save_chart_loss_acc(hist)
-    acc, loss = model.evaluate(x_test,y_test, verbose=0)
+      hist = model.fit(x_train, y_train,
+      batch_size=num_batch_size,
+        epochs=num_epochs,
+        validation_data=(x_test, y_test),
+          callbacks=[callbacks],
+          verbose=1)
+      model.save(nama_model)
+      save_chart_loss_acc(hist)
+      acc, loss = model.evaluate(x_test,y_test, verbose=0)
 
-    yield "<li>Accuracy : {:.2f} Loss : {:.2f} </li>\n".format(acc, loss) 
-    # f.write('<li>Accuracy : {:.2f} Loss : {:.2f} </li>'.format(acc, loss))
-    yield "[INFO] Training process finish... <a href='/training'>back to admin</a> \n"
-    training_process = False
-    print("training selesai")
+      yield "<li>Accuracy : {:.2f} Loss : {:.2f} </li>\n".format(acc, loss) 
+      # f.write('<li>Accuracy : {:.2f} Loss : {:.2f} </li>'.format(acc, loss))
+      yield "[INFO] Training process finish... <a href='/training'>back to admin</a> \n"
+      training_process = False
+      print("training selesai")
+  except Exception as ex:
+    app.logger.error(f'{ex}')
+    return '0'
 
   return app.response_class(generate())
 
@@ -657,7 +662,7 @@ def upload_file():
     val = (temp_file, OUTPUT, datetime.now())
     cursor.execute(sql, val)
     conn.commit()
-  return 0
+  return '0'
 
 OUTPUT = 'Not Recognized'
 @app.route('/')
@@ -672,4 +677,5 @@ def result():
 if __name__ == '__main__':
   # Start the Flask server in a new thread
   openDb()
+  logging.basicConfig(filename='static/error.log',level=logging.DEBUG)
   app.run(host='0.0.0.0',port=8000, debug=True)

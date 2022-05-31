@@ -1,0 +1,31 @@
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 163-677-100
+WARNING:werkzeug: * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+INFO:werkzeug: * Running on http://192.168.22.141:8000/ (Press CTRL+C to quit)
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:16:55] "[35m[1mGET /ds HTTP/1.1[0m" 500 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:16:55] "GET /ds?__debugger__=yes&cmd=resource&f=debugger.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:16:55] "GET /ds?__debugger__=yes&cmd=resource&f=style.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:16:55] "GET /ds?__debugger__=yes&cmd=resource&f=ubuntu.ttf HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:16:55] "GET /ds?__debugger__=yes&cmd=resource&f=console.png HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in 'D:\\Freelance Project\\Web_Klasifikasi_Suara\\app.py', reloading
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 163-677-100
+WARNING:werkzeug: * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+INFO:werkzeug: * Running on http://192.168.22.141:8000/ (Press CTRL+C to quit)
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:36] "GET /ds HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:37] "GET /static/css/sb-admin-2.min.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:37] "GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:37] "GET /static/vendor/datatables/dataTables.bootstrap4.min.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:37] "GET /static/images/undraw_profile.svg HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:37] "GET /static/vendor/datatables/dataTables.bootstrap4.min.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:37] "GET /static/vendor/datatables/jquery.dataTables.min.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:40] "GET /training HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:40] "GET /static/css/sb-admin-2.min.css HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:40] "GET /static/vendor/bootstrap/js/bootstrap.bundle.min.js HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:40] "GET /static/images/undraw_profile.svg HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:17:40] "GET /static/grafik/train_chart.png HTTP/1.1" 200 -
+INFO:werkzeug:192.168.22.141 - - [31/May/2022 11:18:08] "GET /static/error.log HTTP/1.1" 200 -
