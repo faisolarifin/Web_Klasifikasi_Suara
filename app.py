@@ -531,32 +531,29 @@ def trainmodel():
       print("training start")
       yield "<p> <a href='/training'><< back to training page</a> </p>\n"
       model = my_model()
-      f = open("temp/log_train.pkl", "wb")
-      logs=''
+      f = open("temp/log_train.txt", "w")
 
       stream = io.StringIO()
       model.summary(print_fn=lambda x:stream.write(x + '<br>'))
       summary_string = stream.getvalue()
       stream.close()
       yield summary_string + '\n'
-      logs += f'<ul><li>{summary_string}</li>'
+      f.write(f'<ul><li>{summary_string}</li>')
 
       yield "[INFO] Preparing... <br>\n"
-      logs += '<li>[INFO] Preparing...</li>'
+      f.write('<li>[INFO] Preparing...</li>')
       create_metadata()
       x_train, y_train, x_test, y_test = data_train_test()
 
       yield "[INFO] Training process running... <br>\n"
-      logs += '<li>[INFO] Training process running...</li>'
+      f.write('<li>[INFO] Training process running...</li>')
       time.sleep(0.8)
       yield f"[INFO] Parameter set with {num_epochs} epoch and {num_batch_size} batch size <br>\n"
-      logs += f'<li>[INFO] Parameter set with {num_epochs} epoch and {num_batch_size} batch size</li>'
+      f.write(f'<li>[INFO] Parameter set with {num_epochs} epoch and {num_batch_size} batch size</li>')
       time.sleep(0.6)
       yield "[INFO] Please wait. don't refresh browser until the finished... <br>\n"
-      logs += '<li>[INFO] Please wait. dont refresh browser until the finished...</li>'
-      logs += '<li>[INFO] Training process finish...</li></ul>'
-
-      pickle.dump(logs, f)
+      f.write('<li>[INFO] Please wait. dont refresh browser until the finished...</li>')
+      f.write('<li>[INFO] Training process finish...</li></ul>')
       f.close()
 
       hist = model.fit(x_train, y_train,
@@ -599,8 +596,8 @@ def training():
       train_model = False
       return redirect(url_for('trainmodel'))
 
-  f = pickle.load(open("temp/log_train.pkl", "rb"))
-  return render_template('training.html', train_model=train_model, training_process=training_process, row=rowData, log=f)
+  f = open("temp/log_train.txt", "r")
+  return render_template('training.html', train_model=train_model, training_process=training_process, row=rowData, log=f.read())
 
 @app.route("/stoptrain")
 def stoptrain():
